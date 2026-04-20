@@ -35,7 +35,7 @@ const NavWidgets = ({image}: {image:string | StaticImageData}) => {
         <div className='relative flex sm:hidden flex-col gap-4' >
             <div className='flex justify-between items-center p-5'>
                 <div className='flex md:hidden gap-2 items-center'>
-                    <Image src="/logo-Upac.png" alt="Logo" width={40} height={20} />
+                    <Image src="/logo-Upac.png" alt="Logo" width={40} height={20} /> 
                     <div>
                         <p className='text-black font-bold text-xl  uppercase'>Upac</p>   
                         <p className='text-gray-300 text-xs'>Université Protestante d'Afrique Centrale</p>
@@ -73,12 +73,12 @@ const NavWidgets = ({image}: {image:string | StaticImageData}) => {
                 </AnimatePresence>
             <div className='px-5 w-full relative'>
                 <Input className='w-full bg-neutral px-5' placeholder='search catalog ...'/>
-                <div className='bg-white absolute shadow-sm top-1/2 right-5 transform -translate-y-1/2 py-[11px] w-12 flex items-center justify-center'>
+                <div className='bg-white absolute shadow-sm top-1/2 right-5 transform -translate-y-1/2 py-[10px] w-10 flex rounded-full items-center justify-center'>
                 <Search size={20} />
                 </div> 
             </div>
         </div>
-        <div className='hidden sm:flex items-center justify-around bg-white rounded-sm shadow-md py-[12px] px-5 '>
+        <div className='hidden sm:flex items-center justify-around bg-white rounded-sm shadow-sm py-[12px] px-5 '>
 
             <div className='relative flex items-center'>
                 <Input className='relative md:min-w-[400px] sm:max-w-[200px] xl:min-w-[500px] px-12 focus-visible:outline-none focus-visible:ring-0 bg-neutral' placeholder='search catalog ... '>
