@@ -1,40 +1,48 @@
-import React, { forwardRef, InputHTMLAttributes } from "react";
+import { forwardRef, InputHTMLAttributes, useId } from "react";
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+import { cn } from "@/lib/utils";
+
+export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
 }
 
-const input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, className = "", ...props }, ref) => {
+const Input = forwardRef<HTMLInputElement, InputProps>(
+  ({ label, error, className = "", id, ...props }, ref) => {
+    const autoId = useId();
+    const inputId = id ?? autoId;
+
     return (
       <div className="w-full space-y-1.5">
         {label && (
-          <label className="md:text-md text-sm font-bold text-secondary">
+          <label htmlFor={inputId} className="block text-sm font-medium text-foreground">
             {label}
           </label>
         )}
         <input
           ref={ref}
-          className={` relative
-            flex h-10 w-full rounded-md border border-neutral bg-gray-150 px-3 py-5 
-            text-sm ring-offset-white file:border-0 file:bg-transparent 
-            file:text-sm file:font-medium placeholder:text-black/40
-            focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary 
-            disabled:cursor-not-allowed disabled:opacity-50
-            ${error ? "border-red-500 focus-visible:ring-red-500" : ""}
-            ${className}
-          `}
+          id={inputId}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? `${inputId}-error` : undefined}
+          className={cn(
+            "flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm text-foreground",
+            "placeholder:text-muted-foreground/60",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-1 focus-visible:ring-offset-white",
+            "disabled:cursor-not-allowed disabled:opacity-50",
+            error ? "border-destructive" : "border-border-strong hover:border-primary/40",
+            className
+          )}
           {...props}
         />
         {error && (
-          <p className="text-xs text-red-500 mt-1">{error}</p>
+          <p id={`${inputId}-error`} className="text-xs text-destructive" role="alert">
+            {error}
+          </p>
         )}
       </div>
     );
   }
 );
+Input.displayName = "Input";
 
-input.displayName = "input";
-
-export default input;
+export default Input;

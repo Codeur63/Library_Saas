@@ -1,9 +1,9 @@
-import Loader from "@/components/ui/loader";
+import { AuthCardSkeleton } from "@/components/feedback/skeletons";
 
 export default function Loading() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral">
-      <Loader />
+    <div className="flex min-h-screen items-center justify-center bg-surface px-4 py-12">
+      <AuthCardSkeleton />
     </div>
   );
 }

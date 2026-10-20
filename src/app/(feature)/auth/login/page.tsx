@@ -1,79 +1,150 @@
-'use client';
+"use client";
 
-import Input from '@/components/ui/input';
-import { ShieldCheck } from 'lucide-react';
-import Link from 'next/link';
-import React from 'react';
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
-function Login() {
-  return (
-    <div className='relative bg-neutral overflow-hidden'>
-      <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/5 via-white to-blue-600/5" />
-        <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-emerald-500/10 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-500/10 blur-[120px] rounded-full" />
-      </div>
+import { Button } from "@/components/ui/button";
+import Input from "@/components/ui/input";
+import { loginAction } from "@/server/actions/auth.actions";
+import { MATRICULE_PATTERN } from "@/features/auth/lib/matricule";
 
-      <div className="hidden md:absolute inset-0 md:flex items-center justify-center">
-        <p className='font-bold text-[400px] opacity-50 bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-blue-600'>UPAC</p>   
-      </div> 
-
-      <div className='relative min-h-screen flex flex-col gap-8 justify-center items-center p-4'>
-        <div className='text-center space-y-1'>
-          <p className='text-primary font-mono font-black tracking-tighter md:text-3xl xl:text-5xl text-2xl uppercase'>
-            University UPAC 
-          </p> 
-          <p className='text-primary/60 font-bold tracking-[0.2em] text-xs md:text-sm uppercase opacity-70'>
-            Academic Library
-          </p>  
-        </div>
-
-        <div className='w-full max-w-[500px] rounded-md bg-white md:bg-opacity-80 shadow-xl shadow-primary/5 border-l-[5px] border-primary overflow-hidden '>
-          <div className='md:px-12 px-8 py-14 flex flex-col gap-10'>
-            
-            <div className='space-y-3'>
-              <h1 className='font-bold text-2xl text-primary tracking-tight'>Access Ledger</h1>  
-              <p className='text-gray-500 text-sm leading-relaxed'>
-                Please authenticate with your <span className="font-semibold text-primary/80">institutional credentials</span> to access the library.
-              </p>
-            </div>
-
-            <form onSubmit={(e)=>e.preventDefault()}>
-              <div className='flex flex-col gap-5'>                
-                <Input 
-                  className='bg-gray-50 border-gray-200 focus:bg-white transition-all' 
-                  placeholder='ex. email@upac.edu' 
-                  label='Institutional Email'
-                  type="email"
-                />
-                <Input 
-                  className='bg-gray-50 border-gray-200 focus:bg-white transition-all' 
-                  placeholder='••••••••' 
-                  label='Password'
-                  type="password"
-                />
-                <button type="submit" className=" w-full mt-2 bg-primary text-white py-3 rounded-md font-bold uppercase tracking-wider hover:bg-black/90 transition-colors ease-linear">
-                  Sign In
-                </button>
-              </div>
-            </form>
-
-            <div className='pt-6 border-t border-gray-100 flex justify-between items-center text-xs font-bold  tracking-widest'>
-                <p className='text-gray-400 hover:text-primary cursor-pointer transition-colors'>
-                  Forgot?
-                </p>
-                <Link href="/auth/register" className='text-primary cursor-pointer hover:underline underline-offset-4 transition-all text-[12px] '>
-                  Sign Up 
-                </Link> 
-                <p className='text-primary cursor-pointer hover:underline underline-offset-4 transition-all'>
-                  Help Center
-                </p>
-            </div> 
-          </div> 
-        </div> 
-      </div>
-    </div>
-  )
+interface FormErrors {
+  matricule?: string;
+  password?: string;
+  form?: string;
 }
 
-export default Login;
+function LoginForm() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const requestedNext = searchParams.get("next");
+  const [matricule, setMatricule] = useState("");
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [pending, setPending] = useState(false);
+
+  const validate = (): FormErrors => {
+    const next: FormErrors = {};
+    const value = matricule.trim().toUpperCase();
+    if (!value) {
+      next.matricule = "Le matricule est requis.";
+    } else if (!MATRICULE_PATTERN.test(value)) {
+      next.matricule = "Matricule invalide (6 à 16 lettres, chiffres ou tirets).";
+    }
+    if (!password) {
+      next.password = "Le mot de passe est requis.";
+    } else if (password.length < 8) {
+      next.password = "Le mot de passe doit contenir au moins 8 caractères.";
+    }
+    return next;
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const nextErrors = validate();
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length === 0) {
+      setPending(true);
+      const result = await loginAction(matricule.trim().toUpperCase(), password, requestedNext ?? undefined);
+      setPending(false);
+
+      if (result.ok) {
+        router.replace(result.data.next);
+        router.refresh();
+      } else {
+        setErrors({ form: result.error.message });
+      }
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-surface px-4 py-12">
+      <div className="w-full max-w-md">
+        <header className="mb-8 flex flex-col items-center gap-3 text-center">
+          <Image
+            src="/logo-Upac.png"
+            alt="Logo Université UPAC"
+            width={56}
+            height={56}
+            className="h-14 w-14 object-contain"
+            priority
+          />
+          <p className="text-2xl font-semibold tracking-tight text-foreground">Upac Library</p>
+          <p className="text-sm text-text-muted">Université Protestante d’Afrique Centrale</p>
+        </header>
+
+        <div className="rounded-lg border border-border bg-white p-6 shadow-sm sm:p-8">
+          <h1 className="text-xl font-semibold text-foreground">Connexion</h1>
+          <p className="mt-1 text-sm text-text-secondary">
+            Accédez à votre bibliothèque numérique.
+          </p>
+
+          {errors.form ? (
+            <p
+              role="alert"
+              className="mt-4 rounded-md border border-border bg-red-50 px-3 py-2 text-sm text-red-700"
+            >
+              {errors.form}
+            </p>
+          ) : null}
+
+          <form className="mt-6 space-y-4" onSubmit={handleSubmit} noValidate>
+            <Input
+              label="Matricule étudiant"
+              type="text"
+              name="matricule"
+              autoComplete="username"
+              placeholder="M2025-00123"
+              value={matricule}
+              onChange={(event) => {
+                setMatricule(event.target.value.toUpperCase());
+              }}
+              error={errors.matricule}
+            />
+            <Input
+              label="Mot de passe"
+              type="password"
+              name="password"
+              autoComplete="current-password"
+              placeholder="8 caractères minimum"
+              value={password}
+              onChange={(event) => {
+                setPassword(event.target.value);
+              }}
+              error={errors.password}
+            />
+
+            <Button type="submit" className="w-full" disabled={pending}>
+              {pending ? "Connexion..." : "Se connecter"}
+            </Button>
+          </form>
+
+          <p className="mt-6 text-center text-sm text-text-muted">
+            Votre compte est créé par votre administration.{" "}
+            <Link
+              href="/auth/register"
+              className="font-medium text-foreground underline-offset-4 hover:underline"
+            >
+              Comment obtenir un compte ?
+            </Link>
+          </p>
+        </div>
+
+        <p className="mt-6 text-center text-xs text-text-muted">
+          Accès réservé aux étudiants, enseignants et personnels de l’UPAC.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
+  );
+}

@@ -1,82 +1,79 @@
-'use client';
+"use client";
 
-import Input from '@/components/ui/input';
-import { ShieldCheck } from 'lucide-react';
-import Link from 'next/link';
-import React from 'react';
+import Image from "next/image";
+import Link from "next/link";
+import { FileUp, UserPlus, KeyRound } from "lucide-react";
 
-function Register() {
+const STEPS = [
+  {
+    icon: UserPlus,
+    title: "Votre compte est créé par l’administration",
+    text: "En vous inscrivant, le secrétariat de votre filière crée votre compte avec votre matricule.",
+  },
+  {
+    icon: KeyRound,
+    title: "Première connexion",
+    text: "Vous recevez un mot de passe temporaire à changer lors de votre première connexion.",
+  },
+  {
+    icon: FileUp,
+    title: "Accédez aux ressources",
+    text: "Une fois connecté, consultez et téléchargez les documents de votre bibliothèque.",
+  },
+];
+
+export default function RegisterPage() {
   return (
-    <div className='relative bg-neutral overflow-hidden'>
-      <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/5 via-white to-blue-600/5" />
-        <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-emerald-500/10 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-500/10 blur-[120px] rounded-full" />
-      </div>
+    <div className="flex min-h-screen items-center justify-center bg-surface px-4 py-12">
+      <div className="w-full max-w-md">
+        <header className="mb-8 flex flex-col items-center gap-3 text-center">
+          <Image
+            src="/logo-Upac.png"
+            alt="Logo Université UPAC"
+            width={56}
+            height={56}
+            className="h-14 w-14 object-contain"
+            priority
+          />
+          <p className="text-2xl font-semibold tracking-tight text-foreground">Upac Library</p>
+          <p className="text-sm text-text-muted">Université Protestante d’Afrique Centrale</p>
+        </header>
 
-      <div className="hidden md:absolute inset-0 md:flex items-center justify-center">
-        <p className='font-bold text-[400px] opacity-50 bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-blue-600'>UPAC</p>   
-      </div> 
+        <div className="rounded-lg border border-border bg-white p-6 shadow-sm sm:p-8">
+          <h1 className="text-xl font-semibold text-foreground">Créer un compte</h1>
+          <p className="mt-1 text-sm text-text-secondary">
+            L’inscription à la bibliothèque se fait auprès de votre établissement.
+          </p>
 
-      <div className='relative min-h-screen flex flex-col gap-8 justify-center items-center p-4'>
-        <div className='text-center space-y-1'>
-          <p className='text-primary font-mono font-black tracking-tighter md:text-3xl xl:text-5xl text-2xl uppercase'>
-            University UPAC 
-          </p> 
-          <p className='text-primary/60 font-bold tracking-[0.2em] text-xs md:text-sm uppercase opacity-70'>
-            Academic Library
-          </p>  
+          <ul className="mt-6 space-y-5">
+            {STEPS.map((step) => (
+              <li key={step.title} className="flex items-start gap-3">
+                <span
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border bg-surface text-text-secondary"
+                  aria-hidden
+                >
+                  <step.icon size={16} />
+                </span>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">{step.title}</p>
+                  <p className="mt-0.5 text-sm leading-relaxed text-text-secondary">{step.text}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          <Link
+            href="/auth/login"
+            className="mt-8 flex h-11 w-full items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            Se connecter
+          </Link>
+
+          <p className="mt-4 rounded-md border border-border bg-surface px-3 py-2 text-center text-xs text-text-secondary">
+            Nouveaux comptes gérés par le secrétariat — aucun mot de passe n’est défini ici.
+          </p>
         </div>
-
-        <div className='w-full max-w-[500px] rounded-md bg-white md:bg-opacity-80 shadow-xl shadow-primary/5 border-l-[5px] border-primary overflow-hidden '>
-          <div className='md:px-12 px-8 py-14 flex flex-col gap-10'>
-            
-            <div className='space-y-3'>
-              <h1 className='font-bold text-2xl text-primary tracking-tight'>Access Ledger</h1>  
-              <p className='text-gray-500 text-sm leading-relaxed'>
-                Please authenticate with your <span className="font-semibold text-primary/80">institutional credentials</span> to access the library.
-              </p>
-            </div>
-
-            <form onSubmit={(e)=>e.preventDefault()}>
-              <div className='flex flex-col gap-5'>                
-                <Input 
-                  className='bg-gray-50 border-gray-200 focus:bg-white transition-all' 
-                  placeholder='ex. email@upac.edu' 
-                  label='Institutional Email'
-                  type="email"
-                />
-                <Input 
-                  className='bg-gray-50 border-gray-200 focus:bg-white transition-all' 
-                  placeholder='••••••••' 
-                  label='Password'
-                  type="password"
-                />
-                <Input 
-                  className='bg-gray-50 border-gray-200 focus:bg-white transition-all' 
-                  placeholder='••••••••' 
-                  label='Confirm Password'
-                  type="password"
-                />
-                <button type="submit" className=" w-full mt-2 bg-primary text-white py-3 rounded-md font-bold uppercase tracking-wider hover:bg-black/90 transition-colors ease-linear">
-                  Sign Up
-                </button>
-              </div>
-            </form>
-
-            <div className='pt-6 border-t border-gray-100 flex justify-between items-center text-xs font-bold  tracking-widest'>
-                <Link href="/auth/login" className='text-primary cursor-pointer hover:underline underline-offset-4 transition-all text-[12px] '>
-                  Sign In
-                </Link> 
-                <p className='text-primary cursor-pointer hover:underline underline-offset-4 transition-all'>
-                  Help Center
-                </p>
-            </div> 
-          </div> 
-        </div> 
       </div>
     </div>
-  )
+  );
 }
-
-export default Register;
