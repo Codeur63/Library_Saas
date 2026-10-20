@@ -9,6 +9,7 @@
 .opencode/
 .devin/
 .next/
+.claude/
 .cursor/
 node_modules/
 AGENTS.md
