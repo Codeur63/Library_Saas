@@ -6,6 +6,7 @@ export const ROUTES = {
   upload: "/upload",
   login: "/auth/login",
   register: "/auth/register",
+  changePassword: "/auth/change-password",
   dashboard: "/dashboard",
   dashboardEtudiants: "/dashboard/etudiants",
   dashboardNouvelEtudiant: "/dashboard/etudiants/nouveau",

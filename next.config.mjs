@@ -33,15 +33,13 @@ const securityHeaders = [
 ];
 
 const nextConfig = {
-  experimental: {
-    // Modules natifs/ESM utilisés côté serveur uniquement pour rasteriser la
-    // première page des PDF : à ne pas bundler par webpack.
-    serverComponentsExternalPackages: ["@napi-rs/canvas", "pdfjs-dist"],
-    // Les polices standard de pdfjs-dist sont lues via fs au runtime : elles
-    // doivent être incluses dans la sortie tracée de la route de couverture.
-    outputFileTracingIncludes: {
-      "/api/documents/**": ["node_modules/pdfjs-dist/standard_fonts/**/*"],
-    },
+  // Modules natifs/ESM utilisés côté serveur uniquement pour rasteriser la
+  // première page des PDF : à ne pas bundler par Turbopack.
+  serverExternalPackages: ["@napi-rs/canvas", "pdfjs-dist"],
+  // Les polices standard de pdfjs-dist sont lues via fs au runtime : elles
+  // doivent être incluses dans la sortie tracée de la route de couverture.
+  outputFileTracingIncludes: {
+    "/api/documents/**": ["node_modules/pdfjs-dist/standard_fonts/**/*"],
   },
   async headers() {
     return [

@@ -43,7 +43,7 @@ export function cached<Args extends unknown[], Result>(
  */
 function safeRevalidate(tag: string): void {
   try {
-    revalidateTag(tag);
+    revalidateTag(tag, "max");
   } catch {
     // Hors contexte Next (scripts) : aucune conséquence fonctionnelle.
   }

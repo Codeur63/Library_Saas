@@ -56,10 +56,10 @@ export default function ChangePasswordPage() {
     <div className="flex min-h-screen items-center justify-center bg-surface px-4 py-12">
       <div className="w-full max-w-md">
         <div className="rounded-lg border border-border bg-white p-6 shadow-sm sm:p-8">
-          <h1 className="text-xl font-semibold text-foreground">Définir un mot de passe</h1>
+          <h1 className="text-xl font-semibold text-foreground">Changer de mot de passe</h1>
           <p className="mt-1 text-sm text-text-secondary">
-            Pour votre première connexion, choisissez un mot de passe personnel avant
-            d’accéder à la bibliothèque.
+            Saisissez votre mot de passe actuel, puis choisissez un nouveau mot de passe
+            personnel.
           </p>
 
           {errors.form ? (
@@ -70,7 +70,7 @@ export default function ChangePasswordPage() {
 
           <form className="mt-6 space-y-4" onSubmit={handleSubmit} noValidate>
             <Input
-              label="Mot de passe actuel (temporaire)"
+              label="Mot de passe actuel"
               type="password"
               name="current"
               autoComplete="current-password"
@@ -100,7 +100,12 @@ export default function ChangePasswordPage() {
               error={errors.confirm}
             />
 
-            <Button type="submit" className="w-full" disabled={isPending || (confirm.length > 0 && confirm !== next)}>
+            <Button
+              type="submit"
+              className="w-full"
+              loading={isPending}
+              disabled={confirm.length > 0 && confirm !== next}
+            >
               {isPending ? "Enregistrement..." : "Enregistrer le mot de passe"}
             </Button>
           </form>

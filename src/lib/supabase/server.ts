@@ -4,8 +4,8 @@ import "server-only";
 
 import { publicEnv } from "@/lib/env-public";
 
-export function createServerSupabase() {
-  const cookieStore = cookies();
+export async function createServerSupabase() {
+  const cookieStore = await cookies();
 
   return createServerClient(publicEnv.supabaseUrl, publicEnv.supabasePublishableKey, {
     cookies: {

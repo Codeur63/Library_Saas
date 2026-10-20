@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, Upload, X } from "lucide-react";
+import { KeyRound, Menu, Upload, X } from "lucide-react";
 import { useState } from "react";
 
 import { ROUTES } from "@/constants/routes";
@@ -191,6 +191,14 @@ export default function Header({ initialProfile = null }: { initialProfile?: Cur
                       Publier un document
                     </Link>
                   )}
+                  <Link
+                    href={ROUTES.changePassword}
+                    onClick={() => setOpen(false)}
+                    className="flex h-10 w-full items-center justify-center gap-2 rounded-md border border-border-strong px-4 text-sm font-medium text-foreground transition-colors hover:bg-surface"
+                  >
+                    <KeyRound size={16} aria-hidden />
+                    Changer mon mot de passe
+                  </Link>
                   <button
                     type="button"
                     onClick={() => {

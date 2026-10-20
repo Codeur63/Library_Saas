@@ -123,7 +123,7 @@ async function ensureAuthUser({ email, password, matricule }) {
   const { data: list, error: listError } = await sb.auth.admin.listUsers({ page: 1, perPage: 1000 });
   if (listError) throw new Error(`listUsers -> ${listError.message}`);
   const existing = list?.users?.find((u) => u.email === email);
-  if (existing) return existing;
+  if (existing) return { user: existing, created: false };
 
   const { data, error } = await sb.auth.admin.createUser({
     email,
@@ -133,7 +133,7 @@ async function ensureAuthUser({ email, password, matricule }) {
   });
   if (error) throw new Error(`createUser(${email}) -> ${error.message}`);
   console.log(`✓ auth.users : ${email} créé`);
-  return data.user;
+  return { user: data.user, created: true };
 }
 
 async function ensureProfile(userId, fields) {
@@ -203,7 +203,8 @@ const adminPassword = Array.from({ length: 12 }, () =>
   "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789"[Math.floor(Math.random() * 57)]
 ).join("");
 
-const adminUser = await ensureAuthUser({ email: adminEmail, password: adminPassword, matricule: adminMatricule });
+const adminResult = await ensureAuthUser({ email: adminEmail, password: adminPassword, matricule: adminMatricule });
+const adminUser = adminResult.user;
 await ensureProfile(adminUser.id, {
   matricule: adminMatricule,
   first_name: "Super",
@@ -212,20 +213,28 @@ await ensureProfile(adminUser.id, {
   status: "ACTIVE",
   must_change_password: true,
 });
-console.warn("┌────────────────────────────────────────────────────────────┐");
-console.warn("│ SUPERADMIN bootstrap (mot de passe temporaire, à changer) │");
-console.warn(`│ matricule : ${adminMatricule}                                │`);
-console.warn(`│ email    : ${adminEmail}                                     │`);
-console.warn(`│ mot de passe : ${adminPassword}                               │`);
-console.warn("└────────────────────────────────────────────────────────────┘");
+if (adminResult.created) {
+  console.warn("┌────────────────────────────────────────────────────────────┐");
+  console.warn("│ SUPERADMIN bootstrap (mot de passe temporaire, à changer) │");
+  console.warn(`│ matricule : ${adminMatricule}                                │`);
+  console.warn(`│ email    : ${adminEmail}                                     │`);
+  console.warn(`│ mot de passe : ${adminPassword}                               │`);
+  console.warn("└────────────────────────────────────────────────────────────┘");
+} else {
+  console.warn(`✓ SUPERADMIN existant (${adminMatricule}) — mot de passe inchangé.`);
+}
 
-// ---- Compte étudiant test ---------------------------------------------------
+// ---- Compte étudiant test (désactivable en production) ----------------------
+if (process.env.SEED_DEMO_STUDENT === "false") {
+  console.log("✓ Étudiant de démonstration ignoré (SEED_DEMO_STUDENT=false)");
+} else {
 const studentMatricule = "STU2026001";
 const studentEmail = "stu2026001@upac.local";
 const { data: giProgram } = await sb.from("programs").select("id").eq("code", "GI").single();
 const { data: l2 } = await sb.from("academic_levels").select("id").eq("code", "L2").single();
 
-const studentUser = await ensureAuthUser({ email: studentEmail, password: DEFAULT_STUDENT_PASSWORD, matricule: studentMatricule });
+const studentResult = await ensureAuthUser({ email: studentEmail, password: DEFAULT_STUDENT_PASSWORD, matricule: studentMatricule });
+const studentUser = studentResult.user;
 await ensureProfile(studentUser.id, {
   matricule: studentMatricule,
   first_name: "Étudiant",
@@ -236,7 +245,12 @@ await ensureProfile(studentUser.id, {
   program_id: giProgram.id,
   level_id: l2.id,
 });
-console.log(`✓ Étudiant test : ${studentMatricule} (${studentEmail}) — mot de passe initial par défaut`);
+console.log(
+  studentResult.created
+    ? `✓ Étudiant test : ${studentMatricule} (${studentEmail}) — mot de passe initial défini par DEFAULT_STUDENT_PASSWORD`
+    : `✓ Étudiant test existant (${studentMatricule}) — mot de passe inchangé`
+);
+}
 
 // ---- Résumé -----------------------------------------------------------------
 for (const table of ["faculties", "programs", "subjects", "academic_levels", "academic_years", "document_categories", "profiles"]) {

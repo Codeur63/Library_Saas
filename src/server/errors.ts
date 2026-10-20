@@ -57,8 +57,8 @@ export interface ActionError {
   requestId?: string;
 }
 
-export function toErrorResult(error: unknown): { ok: false; error: ActionError } {
-  const requestId = getRequestId();
+export async function toErrorResult(error: unknown): Promise<{ ok: false; error: ActionError }> {
+  const requestId = await getRequestId();
 
   if (isAppError(error)) {
     return { ok: false, error: { code: error.code, message: error.message, requestId } };

@@ -16,12 +16,13 @@ import { downloadDocument } from "@/server/services/documents.service";
  */
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<Response> {
   try {
     await enforceRateLimit({ key: rateLimitKey("download:ip", clientIp(request.headers)), ...RATE_LIMITS.downloadByIp });
 
-    const { signedUrl } = await downloadDocument(params.id);
+    const { id } = await params;
+    const { signedUrl } = await downloadDocument(id);
 
     return NextResponse.redirect(signedUrl, {
       status: 302,

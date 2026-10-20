@@ -1,36 +1,33 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Upac Library
 
-## Getting Started
+Bibliothèque numérique universitaire (Next.js 16, Supabase, Prisma, Tailwind).
 
-First, run the development server:
+## Démarrage
 
 ```bash
+cp .env.example .env   # renseigner les valeurs
+npm install
+npx prisma migrate deploy
+npx prisma generate
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Application : <http://localhost:3000>
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Vérifications
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+```bash
+npm run lint
+npm run typecheck
+npm test
+npm run verify:backend   # services (base de test)
+npm run verify:rls       # politiques RLS
+npm run smoke            # API + Storage (serveur démarré)
+```
 
-## Learn More
+## Exploitation
 
-To learn more about Next.js, take a look at the following resources:
+Runbook complet : [docs/operations.md](docs/operations.md) (configuration,
+supervision, sauvegardes, rotation des secrets, incidents, go-live).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Checklist de mise en production : [docs/production-checklist.md](docs/production-checklist.md).

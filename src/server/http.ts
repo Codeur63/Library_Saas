@@ -13,8 +13,8 @@ import { getRequestId, REQUEST_ID_HEADER } from "@/server/request-id";
  * `requestId` est renvoyé dans le corps ET dans l'en-tête `x-request-id` pour
  * permettre la corrélation avec les logs serveur.
  */
-export function errorResponse(error: unknown): NextResponse {
-  const requestId = getRequestId();
+export async function errorResponse(error: unknown): Promise<NextResponse> {
+  const requestId = await getRequestId();
   const headers: Record<string, string> = {};
   if (requestId) headers[REQUEST_ID_HEADER] = requestId;
 

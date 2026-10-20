@@ -64,7 +64,7 @@ async function profileToCurrentUser(profileId: string): Promise<CurrentUser> {
  * requête Prisma au lieu de plusieurs. `requireCurrentUser` en hérite.
  */
 export const getCurrentUser = requestCache(async (): Promise<CurrentUser | null> => {
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const {
     data: { user },
   } = await supabase.auth.getUser();

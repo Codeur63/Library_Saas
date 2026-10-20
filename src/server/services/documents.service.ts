@@ -210,7 +210,7 @@ export async function downloadDocument(id: string, currentUser = requireCurrentU
 
   // Compteur incrémenté via la RPC PostgreSQL avec la session utilisateur
   // (auth.uid() requis par private.can_access_document) — jamais côté frontend.
-  const { error: rpcError } = await createServerSupabase().rpc("increment_download_count", {
+  const { error: rpcError } = await (await createServerSupabase()).rpc("increment_download_count", {
     p_document_id: document.id,
   });
   if (rpcError) {

@@ -18,19 +18,24 @@ jobs:
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000' }}
-      SUPERADMIN_PASSWORD: ${{ secrets.SUPERADMIN_PASSWORD || 'q8ptxyCVjPPn' }}
-      DEFAULT_STUDENT_PASSWORD: ${{ secrets.DEFAULT_STUDENT_PASSWORD || 'UPAC0000' }}
+      ALLOW_INSECURE_SITE_URL: "true"
+      SUPERADMIN_PASSWORD: ${{ secrets.SUPERADMIN_PASSWORD }}
+      DEFAULT_STUDENT_PASSWORD: ${{ secrets.DEFAULT_STUDENT_PASSWORD }}
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
       ERROR_WEBHOOK_URL: ${{ secrets.ERROR_WEBHOOK_URL }}
 
     steps:
       - name: Check secrets
         id: secrets
         run: |
-          if [ -n "${{ secrets.DATABASE_URL }}" ] && [ -n "${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" ]; then
+          if [ -n "$DATABASE_URL" ] \
+            && [ -n "$SUPABASE_SERVICE_ROLE_KEY" ] \
+            && [ -n "$SUPERADMIN_PASSWORD" ] \
+            && [ -n "$DEFAULT_STUDENT_PASSWORD" ]; then
             echo "configured=true" >> "$GITHUB_OUTPUT"
           else
             echo "configured=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::Secrets DATABASE_URL / SUPABASE_SERVICE_ROLE_KEY absents : job ignoré."
+            echo "::warning::Secrets DATABASE_URL / SUPABASE_SERVICE_ROLE_KEY / SUPERADMIN_PASSWORD / DEFAULT_STUDENT_PASSWORD absents : job ignoré."
           fi
 
       - name: Checkout

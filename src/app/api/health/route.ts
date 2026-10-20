@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
  */
 export async function GET(): Promise<Response> {
   const startedAt = Date.now();
-  const requestId = getRequestId();
+  const requestId = await getRequestId();
   try {
     await prisma.$queryRaw`SELECT 1`;
     return NextResponse.json(

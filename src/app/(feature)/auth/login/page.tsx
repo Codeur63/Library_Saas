@@ -117,7 +117,7 @@ function LoginForm() {
               error={errors.password}
             />
 
-            <Button type="submit" className="w-full" disabled={pending}>
+            <Button type="submit" className="w-full" loading={pending}>
               {pending ? "Connexion..." : "Se connecter"}
             </Button>
           </form>

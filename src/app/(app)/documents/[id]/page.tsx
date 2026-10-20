@@ -12,12 +12,13 @@ import { AppError } from "@/server/errors";
 import { formatBytes, formatFrenchDate } from "@/utils/format";
 
 interface DocumentPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function generateMetadata({ params }: DocumentPageProps): Promise<Metadata> {
   try {
-    const document = await getDocument(params.id);
+    const { id } = await params;
+    const document = await getDocument(id);
     return {
       title: `${document.title} — Upac Library`,
       description: document.description ?? undefined,
@@ -28,9 +29,10 @@ export async function generateMetadata({ params }: DocumentPageProps): Promise<M
 }
 
 export default async function DocumentPage({ params }: DocumentPageProps) {
+  const { id } = await params;
   let document;
   try {
-    document = await getDocument(params.id);
+    document = await getDocument(id);
   } catch (error) {
     if (error instanceof AppError) notFound();
     throw error;

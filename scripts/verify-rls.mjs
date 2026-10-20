@@ -13,10 +13,10 @@ const PUBLISHABLE = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 const SERVICE = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const STUDENT_EMAIL = "stu2026001@upac.local";
 const STUDENT_PASSWORD = process.env.DEFAULT_STUDENT_PASSWORD;
-const SUPERADMIN_PASSWORD = process.env.SUPERADMIN_PASSWORD ?? "q8ptxyCVjPPn";
+const SUPERADMIN_PASSWORD = process.env.SUPERADMIN_PASSWORD;
 
-if (!URL || !PUBLISHABLE || !SERVICE || !STUDENT_PASSWORD) {
-  console.error("Variables Supabase / DEFAULT_STUDENT_PASSWORD manquantes.");
+if (!URL || !PUBLISHABLE || !SERVICE || !STUDENT_PASSWORD || !SUPERADMIN_PASSWORD) {
+  console.error("Variables Supabase / DEFAULT_STUDENT_PASSWORD / SUPERADMIN_PASSWORD manquantes.");
   process.exit(1);
 }
 

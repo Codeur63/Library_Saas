@@ -31,7 +31,7 @@ function isPublicAsset(pathname: string): boolean {
   );
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Corrélation de bout en bout : l'ID est repris s'il vient d'un proxy de

@@ -19,10 +19,11 @@ export const runtime = "nodejs";
  */
 export async function GET(
   _request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<Response> {
   try {
-    const document = await requireAccessibleDocument(params.id);
+    const { id } = await params;
+    const document = await requireAccessibleDocument(id);
 
     if (!isRenderablePdf(document.mimeType, document.fileExtension)) {
       return NextResponse.json({ error: "Aucun aperçu disponible pour ce format." }, { status: 404 });

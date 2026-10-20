@@ -9,12 +9,10 @@ import {
   Binary,
   ChevronRight,
   ClipboardList,
-  FileDown,
   FileSearch,
   FileText,
   GraduationCap,
   Search,
-  SlidersHorizontal,
   type LucideIcon,
 } from "lucide-react";
 
@@ -25,6 +23,7 @@ import DownloadCount from "@/features/documents/components/download-count";
 import { getCurrentUser, type CurrentUser } from "@/server/current-user";
 import { getLibraryOverview } from "@/server/services/library.service";
 import type { LibraryOverview } from "@/types/library";
+import { formatBytes, formatFrenchDate } from "@/utils/format";
 
 const primaryButton =
   "inline-flex h-11 items-center justify-center gap-2 rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90";
@@ -36,12 +35,6 @@ export const metadata: Metadata = {
   description:
     "Cours, travaux dirigés, examens et mémoires en ligne pour les étudiants de toutes les filières de l'Université Protestante d'Afrique Centrale.",
 };
-
-const STEPS = [
-  { icon: Search, title: "Rechercher", text: "Cherchez par titre, matière ou filière." },
-  { icon: SlidersHorizontal, title: "Filtrer", text: "Affinez par niveau, matière et type de document." },
-  { icon: FileDown, title: "Télécharger", text: "Récupérez le document en quelques secondes." },
-];
 
 const CATEGORY_ICONS: { match: string; icon: LucideIcon }[] = [
   { match: "cours", icon: FileText },
@@ -83,12 +76,12 @@ export default async function AccueilPage() {
 
   return (
     <div>
-      <section className="mx-auto grid w-full max-w-[1280px] gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-24">
+      <section className="mx-auto grid w-full max-w-[1280px] gap-10 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-16">
         <div>
           <p className="text-xs font-medium uppercase tracking-[0.18em] text-text-muted">
             Université Protestante d’Afrique Centrale
           </p>
-          <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
+          <h1 className="mt-3 max-w-[20ch] text-[2.25rem] font-semibold leading-[1.12] tracking-tight sm:text-[2.5rem]">
             La bibliothèque académique de l’UPAC
           </h1>
           <p className="mt-4 max-w-[60ch] text-base leading-relaxed text-text-secondary">
@@ -116,15 +109,34 @@ export default async function AccueilPage() {
               <Search size={16} aria-hidden />
             </button>
           </form>
-          <p className="mt-4 text-xs text-text-muted">
-            Ou{" "}
-            <Link
-              href={ROUTES.filieres}
-              className="font-medium text-foreground underline-offset-4 hover:underline"
-            >
-              explorez par filière
-            </Link>
-          </p>
+          {user ? (
+            <p className="mt-4 text-xs text-text-muted">
+              Ou{" "}
+              <Link
+                href={ROUTES.filieres}
+                className="font-medium text-foreground underline-offset-4 hover:underline"
+              >
+                explorez par filière
+              </Link>
+            </p>
+          ) : (
+            <p className="mt-4 max-w-xl text-xs leading-relaxed text-text-muted">
+              L’accès au catalogue est réservé aux étudiants et personnels de l’UPAC.{" "}
+              <Link
+                href={ROUTES.login}
+                className="font-medium text-foreground underline-offset-4 hover:underline"
+              >
+                Se connecter
+              </Link>{" "}
+              ·{" "}
+              <Link
+                href={ROUTES.register}
+                className="font-medium text-foreground underline-offset-4 hover:underline"
+              >
+                Demander un compte
+              </Link>
+            </p>
+          )}
         </div>
 
         <div
@@ -150,12 +162,23 @@ export default async function AccueilPage() {
 
       <section className="mx-auto w-full max-w-[1280px] px-4 py-14 sm:px-6">
         <div className="border-t border-border pt-14">
-          <p className="text-xs font-medium uppercase tracking-[0.18em] text-text-muted">
-            Notre institution
-          </p>
-          <h2 className="mt-3 max-w-[38ch] text-2xl font-semibold tracking-tight text-foreground">
-            L’UPAC, quatre facultés au service de chaque vocation
-          </h2>
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-text-muted">
+                Notre institution
+              </p>
+              <h2 className="mt-3 max-w-[38ch] text-2xl font-semibold tracking-tight text-foreground">
+                L’UPAC, quatre facultés au service de chaque vocation
+              </h2>
+            </div>
+            <Link
+              href={ROUTES.filieres}
+              className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-foreground underline-offset-4 hover:underline"
+            >
+              Toutes les filières
+              <ArrowRight size={15} aria-hidden />
+            </Link>
+          </div>
           <p className="mt-4 max-w-[80ch] text-sm leading-relaxed text-text-secondary">
             Sur la colline de Djoungolo à Yaoundé (Cameroun), l’Université Protestante d’Afrique
             Centrale — institution confessionnelle d’enseignement supérieur fondée en 1962 —
@@ -167,8 +190,8 @@ export default async function AccueilPage() {
           {FACULTIES.map((faculty) => {
             const Icon = faculty.icon;
             return (
-              <li key={faculty.code} className="px-1 py-6 sm:px-3">
-                <div className="grid gap-4 md:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] md:gap-8">
+              <li key={faculty.code} className="px-1 py-5 sm:px-3">
+                <div className="grid gap-3 md:grid-cols-[minmax(0,18rem)_minmax(0,1fr)] md:items-start md:gap-8">
                   <div className="flex min-w-0 items-start gap-3">
                     <span
                       className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-border bg-surface text-text-secondary"
@@ -186,54 +209,12 @@ export default async function AccueilPage() {
                       </p>
                     </div>
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-sm leading-relaxed text-text-secondary">
-                      {faculty.description}
-                    </p>
-                    <dl className="mt-4 grid gap-x-8 gap-y-3 sm:grid-cols-2">
-                      {faculty.departments.map((dept) => (
-                        <div key={dept.name}>
-                          <dt className="text-xs font-semibold text-foreground">{dept.name}</dt>
-                          {dept.filieres.length > 0 ? (
-                            <dd className="mt-1.5 text-xs leading-relaxed text-text-muted">
-                              {dept.filieres.map((filiere) => (
-                                <span key={filiere.label} className="block">
-                                  {filiere.label}
-                                  {filiere.options ? ` — ${filiere.options.join(" · ")}` : ""}
-                                </span>
-                              ))}
-                            </dd>
-                          ) : null}
-                        </div>
-                      ))}
-                    </dl>
-                  </div>
+                  <p className="text-sm leading-relaxed text-text-secondary">{faculty.description}</p>
                 </div>
               </li>
             );
           })}
         </ul>
-      </section>
-
-      <section className="mx-auto w-full max-w-[1280px] px-4 py-16 sm:px-6">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-12">
-          {STEPS.map((step, index) => (
-            <div key={step.title} className={index > 0 ? "md:border-l md:border-border md:pl-12" : ""}>
-              <div className="flex items-center gap-3">
-                <span
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-border bg-surface text-text-secondary"
-                  aria-hidden
-                >
-                  <step.icon size={18} />
-                </span>
-                <h2 className="text-base font-semibold text-foreground">{step.title}</h2>
-              </div>
-              <p className="mt-3 max-w-[40ch] text-sm leading-relaxed text-text-secondary">
-                {step.text}
-              </p>
-            </div>
-          ))}
-        </div>
       </section>
 
       <section className="mx-auto w-full max-w-[1280px] px-4 py-14 sm:px-6">
@@ -267,12 +248,12 @@ export default async function AccueilPage() {
         <div className="mx-auto flex w-full max-w-[1280px] flex-col items-start gap-6 px-4 py-14 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-              {user ? "Poursuivez votre recherche" : "Rejoignez la bibliothèque numérique"}
+              {user ? "Poursuivez votre recherche" : "Accéder à la bibliothèque"}
             </h2>
             <p className="mt-2 max-w-[60ch] text-base text-text-secondary">
               {user
                 ? "Explorez l’ensemble du catalogue, filtrez par filière, niveau et matière, et enregistrez vos favoris."
-                : "Un compte vous permet de retrouver vos filières préférées et de suivre les nouvelles ressources publiées."}
+                : "Le catalogue est réservé aux étudiants et personnels de l’UPAC. Connectez-vous avec votre matricule ou demandez un compte au secrétariat de votre filière."}
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
@@ -282,11 +263,11 @@ export default async function AccueilPage() {
               </Link>
             ) : (
               <>
-                <Link href={ROUTES.register} className={primaryButton}>
-                  Créer un compte
-                </Link>
-                <Link href={ROUTES.login} className={secondaryButton}>
+                <Link href={ROUTES.login} className={primaryButton}>
                   Se connecter
+                </Link>
+                <Link href={ROUTES.register} className={secondaryButton}>
+                  Demander un compte
                 </Link>
               </>
             )}
@@ -304,10 +285,10 @@ async function LibraryOverviewSection({ user }: { user: CurrentUser }) {
 
 function LibrarySections({ overview }: { overview: LibraryOverview }) {
   const stats = [
-    { label: "Documents", value: overview.totals.documents, suffix: "publics" },
-    { label: "Filières", value: overview.totals.programs, suffix: "représentées" },
-    { label: "Matières", value: overview.totals.subjects, suffix: "couvertes" },
-    { label: "Types", value: overview.totals.categories, suffix: "de ressources" },
+    { label: "Documents", value: overview.totals.documents },
+    { label: "Filières", value: overview.totals.programs },
+    { label: "Matières", value: overview.totals.subjects },
+    { label: "Types", value: overview.totals.categories },
   ];
   const recent = overview.recentDocuments;
   const categories = overview.categories.filter((category) => category.count > 0);
@@ -325,7 +306,6 @@ function LibrarySections({ overview }: { overview: LibraryOverview }) {
               </dt>
               <dd className="mt-2 text-3xl font-semibold tracking-tight text-foreground">
                 {stat.value}
-                <span className="ml-1 text-sm font-normal text-text-secondary">{stat.suffix}</span>
               </dd>
             </div>
           ))}
@@ -337,35 +317,54 @@ function LibrarySections({ overview }: { overview: LibraryOverview }) {
           <div className="mx-auto w-full max-w-[1280px] px-4 py-14 sm:px-6">
             <div className="flex items-baseline justify-between gap-4">
               <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-                Derniers documents
+                Derniers ajouts
               </h2>
               <Link
                 href={ROUTES.bibliotheque}
                 className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground underline-offset-4 hover:underline"
               >
-                Tout voir
+                Tout le catalogue
                 <ArrowRight size={15} aria-hidden />
               </Link>
             </div>
             <ul className="mt-6 divide-y divide-border border-y border-border bg-white">
-              {recent.map((doc) => (
-                <li key={doc.id}>
-                  <Link
-                    href={documentRoute(doc.id)}
-                    className="flex flex-col gap-1 px-1 py-4 transition-colors hover:bg-surface sm:flex-row sm:items-baseline sm:gap-4 sm:px-3"
-                  >
-                    <span className="min-w-0 truncate text-sm font-medium text-foreground">
-                      {doc.title}
-                    </span>
-                    <span className="text-xs text-text-muted sm:ml-auto shrink-0">
-                      {doc.subject.program.name} · {doc.subject.level.code} · {doc.subject.name}
-                    </span>
-                    <span className="text-xs text-text-muted">
-                      <DownloadCount count={doc.downloadCount} />
-                    </span>
-                  </Link>
-                </li>
-              ))}
+              {recent.map((doc) => {
+                const Icon = iconForCategory(doc.category.name);
+                return (
+                  <li key={doc.id}>
+                    <Link
+                      href={documentRoute(doc.id)}
+                      className="group flex items-start gap-3 px-1 py-4 transition-colors hover:bg-surface sm:items-center sm:gap-4 sm:px-3"
+                    >
+                      <span
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-border bg-surface text-text-muted"
+                        aria-hidden
+                      >
+                        <Icon size={18} />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-semibold text-foreground group-hover:underline group-hover:underline-offset-4">
+                          {doc.title}
+                        </span>
+                        <span className="mt-0.5 block text-xs text-text-muted">
+                          {doc.subject.program.name} · {doc.subject.level.code} ·{" "}
+                          {doc.subject.name} · {doc.category.name}
+                        </span>
+                      </span>
+                      <span className="flex shrink-0 flex-col items-end gap-1 text-xs text-text-muted sm:flex-row sm:items-center sm:gap-3">
+                        <span className="hidden rounded border border-border bg-surface px-1.5 py-0.5 font-medium text-text-secondary sm:inline">
+                          {doc.fileExtension.toUpperCase()}
+                        </span>
+                        <span>{formatBytes(doc.fileSize)}</span>
+                        <span className="hidden lg:inline">
+                          {formatFrenchDate(doc.createdAt, true)}
+                        </span>
+                        <DownloadCount count={doc.downloadCount} compact />
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         </section>
@@ -376,14 +375,14 @@ function LibrarySections({ overview }: { overview: LibraryOverview }) {
           <h2 className="text-2xl font-semibold tracking-tight text-foreground">
             Par type de ressource
           </h2>
-          <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <ul className="mt-6 divide-y divide-border border-y border-border">
             {categories.map((category) => {
               const Icon = iconForCategory(category.name);
               return (
                 <li key={category.id}>
                   <Link
                     href={`${ROUTES.bibliotheque}?categoryId=${category.id}`}
-                    className="group flex items-center gap-4 rounded-lg border border-border bg-white p-5 transition-colors hover:border-border-strong hover:bg-surface"
+                    className="group flex items-center gap-4 px-1 py-4 transition-colors hover:bg-surface sm:px-3"
                   >
                     <span
                       className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-border bg-surface text-text-secondary"
@@ -391,7 +390,7 @@ function LibrarySections({ overview }: { overview: LibraryOverview }) {
                     >
                       <Icon size={18} />
                     </span>
-                    <span>
+                    <span className="min-w-0 flex-1">
                       <span className="block text-sm font-semibold text-foreground">
                         {category.name}
                       </span>
@@ -402,7 +401,7 @@ function LibrarySections({ overview }: { overview: LibraryOverview }) {
                     <ChevronRight
                       size={16}
                       aria-hidden
-                      className="ml-auto text-text-muted transition-transform group-hover:translate-x-0.5"
+                      className="shrink-0 text-text-muted transition-transform group-hover:translate-x-0.5"
                     />
                   </Link>
                 </li>
@@ -424,7 +423,7 @@ function LibrarySections({ overview }: { overview: LibraryOverview }) {
               <li key={subject.id}>
                 <Link
                   href={`${ROUTES.bibliotheque}?subjectId=${subject.id}`}
-                  className="inline-flex items-center gap-2 rounded-full border border-border bg-white px-4 py-2 text-sm text-foreground transition-colors hover:border-border-strong hover:bg-surface"
+                  className="inline-flex items-center gap-2 rounded-md border border-border bg-white px-3.5 py-2 text-sm text-foreground transition-colors hover:border-border-strong hover:bg-surface"
                 >
                   {subject.name}
                   <span className="text-xs text-text-muted">{subject.count}</span>

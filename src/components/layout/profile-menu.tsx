@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown, LogOut } from "lucide-react";
+import { ChevronDown, KeyRound, LogOut } from "lucide-react";
 
+import { ROUTES } from "@/constants/routes";
 import ProfileAvatar, { roleLabelOf } from "@/features/auth/components/profile-avatar";
 import { useSession } from "@/features/auth/components/session-provider";
 import type { CurrentUser } from "@/server/current-user";
@@ -86,6 +88,16 @@ export default function ProfileMenu({ profile }: { profile: CurrentUser }) {
           </div>
 
           <div role="separator" className="my-1.5 h-px bg-border" />
+
+          <Link
+            href={ROUTES.changePassword}
+            role="menuitem"
+            onClick={() => setOpen(false)}
+            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/40"
+          >
+            <KeyRound size={16} aria-hidden className="text-text-muted" />
+            Changer mon mot de passe
+          </Link>
 
           <button
             type="button"

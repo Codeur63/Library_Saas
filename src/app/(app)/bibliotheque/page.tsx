@@ -13,9 +13,9 @@ import { listDocuments } from "@/server/services/documents.service";
 import type { DocumentQueryInput } from "@/server/dto";
 
 interface BibliothequePageProps {
-  searchParams: {
+  searchParams: Promise<{
     [key: string]: string | string[] | undefined;
-  };
+  }>;
 }
 
 export const metadata: Metadata = {
@@ -30,7 +30,7 @@ export default async function BibliothequePage({ searchParams }: BibliothequePag
     redirect(`${ROUTES.login}?next=${encodeURIComponent(ROUTES.bibliotheque)}`);
   }
 
-  const initial = parseLibrarySearchParams(searchParams);
+  const initial = parseLibrarySearchParams(await searchParams);
   const query: DocumentQueryInput = {
     q: initial.query || undefined,
     programId: initial.filters.programId || undefined,

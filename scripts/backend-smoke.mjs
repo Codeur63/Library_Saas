@@ -5,8 +5,13 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const PUBLISHABLE = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 const SERVICE = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const ADMIN_EMAIL = "superadmin@upac.local";
-const ADMIN_PASSWORD = process.env.SUPERADMIN_PASSWORD ?? "q8ptxyCVjPPn";
+const ADMIN_PASSWORD = process.env.SUPERADMIN_PASSWORD;
 const BASE = "http://localhost:3000";
+
+if (!SUPABASE_URL || !PUBLISHABLE || !SERVICE || !ADMIN_PASSWORD) {
+  console.error("Variables NEXT_PUBLIC_SUPABASE_URL / PUBLISHABLE / SERVICE_ROLE / SUPERADMIN_PASSWORD manquantes.");
+  process.exit(1);
+}
 
 const projectRef = new URL(SUPABASE_URL).hostname.split(".")[0];
 const AUTH_COOKIE = `sb-${projectRef}-auth-token`;

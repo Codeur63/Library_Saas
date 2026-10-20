@@ -66,7 +66,7 @@ export async function loginWithMatricule(
     throw new AppError("INVALID_CREDENTIALS", "Matricule ou mot de passe incorrect.");
   }
 
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const { error: signInError } = await supabase.auth.signInWithPassword({
     email: authUser.user.email,
     password,
@@ -119,7 +119,7 @@ export async function changePassword(currentPassword: string, newPassword: strin
     throw new AppError("UNAUTHORIZED", "Impossible de retrouver ce compte.", 401);
   }
 
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
 
   // Vérifier le mot de passe actuel (obligatoire, même en première connexion).
   const { error: verifyError } = await supabase.auth.signInWithPassword({ email, password: currentPassword });
@@ -142,7 +142,7 @@ export async function changePassword(currentPassword: string, newPassword: strin
 
 /** Déconnexion : invalide la session serveur (cookies Supabase). */
 export async function logout(): Promise<void> {
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   await supabase.auth.signOut();
 }
 

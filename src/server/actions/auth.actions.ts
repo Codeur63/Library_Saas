@@ -19,7 +19,7 @@ export async function loginAction(
   requestedNext?: string | null
 ): Promise<ActionResult<LoginSuccess & { next: string }>> {
   try {
-    const success = await loginWithMatricule(matricule, password, clientIp(headers()));
+    const success = await loginWithMatricule(matricule, password, clientIp(await headers()));
     return {
       ok: true,
       data: { ...success, next: resolvePostLoginPath(success.mustChangePassword, requestedNext ?? undefined) },
